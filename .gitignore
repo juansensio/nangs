@@ -1,6 +1,6 @@
 __pycache__
 build
 dist
-.ipynb_checpoints
+.ipynb_checkpoints
 *egg*
 publish.sh
