@@ -1,0 +1,2 @@
+def kk():
+    print("kk")
