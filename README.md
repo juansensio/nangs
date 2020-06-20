@@ -18,8 +18,8 @@ You will also need to insall [Pytorch](https://pytorch.org/).
 
 ## Getting Started
 
-- Learn how to work with nangs with our [tutorials](https://github.com/juansensio/nangs/tree/master/tutorials)
-- See nangs in actions with our [examples](https://github.com/juansensio/nangs/tree/master/examples)
+- Learn how to work with nangs with our [tutorials](https://github.com/juansensio/nangs/tree/master/tutorials).
+- See nangs in actions with our [examples](https://github.com/juansensio/nangs/tree/master/examples).
 
 ## Copyright
 
