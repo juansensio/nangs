@@ -1,1 +1,6 @@
 __pycache__
+build
+dist
+.ipynbs_checpoints
+*egg*
+publish.sh
