@@ -8,8 +8,6 @@ Our objective is to develop a new tool for simulating nature, using Neural Netwo
 
 Read our [paper](https://arxiv.org/abs/1912.04737) to know more.
 
-Read the [docs](https://juansensio.github.io/nangs/).
-
 ## Installing
 
 nangs is on PyPI so you can just run:
