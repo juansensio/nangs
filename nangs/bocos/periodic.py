@@ -25,12 +25,18 @@ class Periodic(Boco):
         assert isinstance(x1, dict), "you must pass a dict with your data"
         assert isinstance(x2, dict), "you must pass a dict with your data"
         assert x1.keys() == x2.keys(), "both inputs must have the same variables"
-        self.vars = [list(x1.keys()), list(x2.keys())]
+        self.vars = [tuple(x1.keys()), tuple(x2.keys())]
         data = [x1.values(), x2.values()]
         self.dataset = PeriodicDataset(data, device)
+
+    def validate(self, inputs, outputs):
+        super().validate()
+        _inputs1, _inputs2 = self.vars
+        assert inputs == _inputs1, f'Boco {self.name} with different inputs !'
+        assert inputs == _inputs2, f'Boco {self.name} with different inputs !'
 
     def computeLoss(self, batch, model, criterion):
         x1, x2 = batch
         p1 = model(x1)
         p2 = model(x2)
-        return criterion(p1, p2)
+        return {self.name: criterion(p1, p2)}

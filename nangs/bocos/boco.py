@@ -13,5 +13,5 @@ class Boco():
         return torch.utils.data.DataLoader(
             self.dataset, batch_size=batch_size, shuffle=shuffle)
 
-    def computeLoss(self, batch, model, criterion):
-        print("This function needs to be overloaded by a boco !!!")
+    def validate(self):
+        assert self.computeLoss, "You need to specify a function to compute the loss"

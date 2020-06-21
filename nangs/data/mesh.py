@@ -17,7 +17,7 @@ class Dataset(torch.utils.data.Dataset):
 class Mesh():
     def __init__(self, data, device="cpu"):
         assert isinstance(data, dict), "you must pass a dict with your data"
-        self.vars, data = list(data.keys()), data.values()
+        self.vars, data = tuple(data.keys()), data.values()
         self.dataset = Dataset(data, device)
         self.device = device
 

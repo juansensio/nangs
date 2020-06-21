@@ -1,6 +1,6 @@
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 from .data import *
 from .nn import *
 from .bocos import *
-from .solver import Solver
+from .pde import PDE
