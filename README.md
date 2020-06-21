@@ -14,7 +14,7 @@ nangs is on PyPI so you can just run:
 
 `pip install nangs`
 
-You will also need to insall [Pytorch](https://pytorch.org/).
+You will also need to install [Pytorch](https://pytorch.org/).
 
 ## Getting Started
 
