@@ -4,7 +4,7 @@
 
 Nangs is a Python library built on top of Pytorch to solve Partial Differential Equations.
 
-Our objective is to develop a new tool for simulating nature, using Neural Networks as solution approximation to Partial Differential Equations, increasing accuracy and optimziation speed while reducing computational cost.
+Our objective is to develop a new tool for simulating nature, using Neural Networks as solution approximation to Partial Differential Equations, increasing accuracy and optimization speed while reducing computational cost.
 
 Read our [paper](https://arxiv.org/abs/1912.04737) to know more.
 
