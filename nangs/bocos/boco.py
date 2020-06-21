@@ -2,9 +2,10 @@ import torch
 
 
 class Boco():
-    def __init__(self, name):
+    def __init__(self, name, w=1.):
         self.name = name
         self.dataset = None
+        self.w = w
 
     def build_dataloader(self, batch_size=None, shuffle=True):
         if batch_size == None:

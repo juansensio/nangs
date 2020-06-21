@@ -16,7 +16,7 @@ class NeumannDataset(torch.utils.data.Dataset):
 
 
 class Neumann(Boco):
-    def __init__(self, x, device="cpu", name="neumann"):
+    def __init__(self, x, device="cpu", name="neumann", w=1.):
         super().__init__(name)
         assert isinstance(x, dict), "you must pass a dict with your data"
         self.vars = tuple(x.keys())

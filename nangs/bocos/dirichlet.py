@@ -20,8 +20,8 @@ class DirichletDataset(torch.utils.data.Dataset):
 
 
 class Dirichlet(Boco):
-    def __init__(self, x, y, device="cpu", name="dirichlet"):
-        super().__init__(name)
+    def __init__(self, x, y, device="cpu", name="dirichlet", w=1.):
+        super().__init__(name, w)
         assert isinstance(x, dict), "you must pass a dict with your data"
         assert isinstance(y, dict), "you must pass a dict with your data"
         self.vars = [tuple(x.keys()), tuple(y.keys())]
@@ -42,4 +42,4 @@ class Dirichlet(Boco):
     def computeLoss(self, batch, model, criterion):
         x, y = batch
         p = model(x)
-        return {self.name: criterion(p[:, self.output_ids], y)}
+        return {self.name: self.w*criterion(p[:, self.output_ids], y)}

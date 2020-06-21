@@ -20,7 +20,7 @@ class PeriodicDataset(torch.utils.data.Dataset):
 
 
 class Periodic(Boco):
-    def __init__(self, x1, x2, device="cpu", name="periodic"):
+    def __init__(self, x1, x2, device="cpu", name="periodic", w=1.):
         super().__init__(name)
         assert isinstance(x1, dict), "you must pass a dict with your data"
         assert isinstance(x2, dict), "you must pass a dict with your data"
