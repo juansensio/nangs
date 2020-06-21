@@ -32,9 +32,14 @@ class Dirichlet(Boco):
         super().validate()
         _inputs, _outputs = self.vars
         assert inputs == _inputs, f'Boco {self.name} with different inputs !'
-        assert outputs == _outputs, f'Boco {self.name} with different outputs !'
+        if outputs != _outputs:
+            print(
+                f'Boco {self.name} with different outputs ! {outputs} vs {_outputs}')
+        # puedo fitear solo algunos outputs
+        self.output_ids = [outputs.index(v)
+                           for v in self.vars[1] if v in outputs]
 
     def computeLoss(self, batch, model, criterion):
         x, y = batch
         p = model(x)
-        return {self.name: criterion(p, y)}
+        return {self.name: criterion(p[:, self.output_ids], y)}
