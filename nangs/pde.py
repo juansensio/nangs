@@ -2,6 +2,8 @@ from fastprogress import master_bar, progress_bar
 from .history import History
 import torch
 from .utils import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def get_lr(optimizer):
@@ -49,8 +51,12 @@ class PDE():
     def computePDELoss(self, vars, grads):
         print("This function need to be overloaded !!!")
 
-    def solve(self, epochs=50, batch_size=None, shuffle=True):
+    def solve(self, epochs=50, batch_size=None, shuffle=True, graph=True):
         dataloaders = self.set_dataloaders(batch_size, shuffle)
+        if graph:
+            self.graph_fig, (self.graph_ax1, self.graph_ax2) = plt.subplots(
+                1, 2, figsize=(15, 5))
+            self.graph_out = display(self.graph_fig, display_id=True)
         # solve PDE
         history = History()
         mb = master_bar(range(1, epochs+1))
@@ -82,10 +88,30 @@ class PDE():
                 self.optimizer.step()
                 mb.child.comment = str(history.average())
             history.step()
-            mb.write(f"Epoch {epoch}/{epochs} {history}")
+            mb.main_bar.comment = str(history)
+            if graph:
+                self.plot_history(history)
+            # mb.write(f"Epoch {epoch}/{epochs} {history}")
             if self.scheduler:
                 self.scheduler.step()
+        if graph:
+            plt.close()
         return history.history
+
+    def plot_history(self, history):
+        self.graph_ax1.clear()
+        self.graph_ax2.clear()
+        for name, metric in history.history.items():
+            if name != 'lr':
+                self.graph_ax1.plot(metric, label=name)
+            else:
+                self.graph_ax2.plot(metric, label=name)
+        self.graph_ax1.legend(loc='upper right')
+        self.graph_ax2.legend(loc='upper right')
+        self.graph_ax1.grid(True)
+        self.graph_ax2.grid(True)
+        self.graph_ax1.set_yscale("log")
+        self.graph_out.update(self.graph_fig)
 
     def set_dataloaders(self, batch_size, shuffle):
         dataloaders = {
