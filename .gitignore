@@ -5,3 +5,4 @@ dist
 *egg*
 publish.sh
 experiments
+*.pth
