@@ -51,7 +51,9 @@ class PDE():
     def computePDELoss(self, vars, grads):
         print("This function need to be overloaded !!!")
 
-    def solve(self, epochs=50, batch_size=None, shuffle=True, graph=True, use_closure=False):
+    def solve(self, epochs=50, batch_size=None, shuffle=True, graph=True, use_closure=False, model_path="model.pth", load=False):
+        if load:
+            self.model = torch.load(model_path)
         dataloaders = self.set_dataloaders(batch_size, shuffle)
         if graph:
             self.graph_fig, (self.graph_ax1, self.graph_ax2) = plt.subplots(
@@ -103,6 +105,7 @@ class PDE():
             # mb.write(f"Epoch {epoch}/{epochs} {history}")
             if self.scheduler:
                 self.scheduler.step()
+            torch.save(self.model, model_path)
         if graph:
             plt.close()
         return self.history.history
@@ -139,9 +142,12 @@ class PDE():
                                      create_graph=True, only_inputs=True)
         return grads
 
-    def eval(self, mesh, batch_size=None):
+    def eval(self, mesh, model_path=None, batch_size=None):
+        if model_path:
+            self.model = torch.load(model_path)
         dataloader = mesh.build_dataloader(batch_size, shuffle=False)
         outputs = torch.tensor([]).to(mesh.device)
+        self.model.to(mesh.device)
         self.model.eval()
         with torch.no_grad():
             for batch in dataloader:

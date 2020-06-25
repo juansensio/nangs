@@ -4,3 +4,4 @@ dist
 .ipynb_checkpoints
 *egg*
 publish.sh
+experiments
