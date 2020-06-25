@@ -1,16 +1,8 @@
 import torch
-
-
-class Sine(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, x):
-        return torch.sin(x)
+from .sine import Sine
 
 
 def block(i, o):
-    fc = torch.nn.Linear(i, o)
     return torch.nn.Sequential(
         Sine(),
         torch.nn.Linear(i, o)

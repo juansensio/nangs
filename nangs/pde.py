@@ -51,52 +51,61 @@ class PDE():
     def computePDELoss(self, vars, grads):
         print("This function need to be overloaded !!!")
 
-    def solve(self, epochs=50, batch_size=None, shuffle=True, graph=True):
+    def solve(self, epochs=50, batch_size=None, shuffle=True, graph=True, use_closure=False):
         dataloaders = self.set_dataloaders(batch_size, shuffle)
         if graph:
             self.graph_fig, (self.graph_ax1, self.graph_ax2) = plt.subplots(
                 1, 2, figsize=(15, 5))
             self.graph_out = display(self.graph_fig, display_id=True)
         # solve PDE
-        history = History()
+        self.history = History()
         mb = master_bar(range(1, epochs+1))
         for epoch in mb:
-            history.add({'lr': get_lr(self.optimizer)})
+            self.history.add({'lr': get_lr(self.optimizer)})
             # iterate over the internal points in batches
             for batch in progress_bar(dataloaders['inner'], parent=mb):
                 X = batch
-                self.optimizer.zero_grad()
-                # optimize for boundary points
-                for boco in self.bocos:
-                    for batch in dataloaders['bocos'][boco.name]:
-                        loss = boco.computeLoss(
-                            batch, self.model, self.criterion)
-                        for name, l in loss.items():
-                            l.backward()
-                            history.add_step({name: l.item()})
-                # optimize for internal points
                 X.requires_grad = True
-                p = self.model(X)
-                loss = self.computePDELoss(X, p)
-                assert isinstance(
-                    loss, dict), "you should return a dict with the name of the equation and the corresponding loss"
-                for name, l in loss.items():
-                    l = self.criterion(l, torch.zeros(
-                        l.shape).to(self.mesh.device))
-                    l.backward(retain_graph=True)
-                    history.add_step({name: l.item()})
-                self.optimizer.step()
-                mb.child.comment = str(history.average())
-            history.step()
-            mb.main_bar.comment = str(history)
+
+                def closure():
+                    self.optimizer.zero_grad()
+                    # optimize for boundary points
+                    for boco in self.bocos:
+                        for batch in dataloaders['bocos'][boco.name]:
+                            loss = boco.computeLoss(
+                                batch, self.model, self.criterion)
+                            for name, l in loss.items():
+                                l.backward()
+                                self.history.add_step({name: l.item()})
+                    # optimize for internal points
+                    p = self.model(X)
+                    loss = self.computePDELoss(X, p)
+                    assert isinstance(
+                        loss, dict), "you should return a dict with the name of the equation and the corresponding loss"
+                    for name, l in loss.items():
+                        l = self.criterion(l, torch.zeros(
+                            l.shape).to(self.mesh.device))
+                        l.backward(retain_graph=True)
+                        self.history.add_step({name: l.item()})
+                    return l
+
+                if use_closure:
+                    self.optimizer.step(closure)
+                else:
+                    closure()
+                    self.optimizer.step()
+
+                mb.child.comment = str(self.history.average())
+            self.history.step()
+            mb.main_bar.comment = str(self.history)
             if graph:
-                self.plot_history(history)
+                self.plot_history(self.history)
             # mb.write(f"Epoch {epoch}/{epochs} {history}")
             if self.scheduler:
                 self.scheduler.step()
         if graph:
             plt.close()
-        return history.history
+        return self.history.history
 
     def plot_history(self, history):
         self.graph_ax1.clear()
