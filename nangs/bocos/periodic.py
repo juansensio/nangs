@@ -3,40 +3,47 @@ import torch
 from .boco import Boco
 
 
-class PeriodicDataset(torch.utils.data.Dataset):
-    def __init__(self, data, device="cpu"):
-        X1 = np.stack(np.meshgrid(*data[0]), -1).reshape(-1, len(data[0]))
-        X2 = np.stack(np.meshgrid(*data[1]), -1).reshape(-1, len(data[1]))
-        assert len(X1) == len(
-            X2), "the length of the inputs don't match"
-        self.X1 = torch.from_numpy(X1).float().to(device)
-        self.X2 = torch.from_numpy(X2).float().to(device)
-
-    def __len__(self):
-        return len(self.X1)
-
-    def __getitem__(self, ix):
-        return self.X1[ix], self.X2[ix]
-
-
 class Periodic(Boco):
-    def __init__(self, x1, x2, device="cpu", name="periodic"):
+    def __init__(self, sampler, sampler1, sampler2, name="periodic"):
         super().__init__(name)
-        assert isinstance(x1, dict), "you must pass a dict with your data"
-        assert isinstance(x2, dict), "you must pass a dict with your data"
-        assert x1.keys() == x2.keys(), "both inputs must have the same variables"
-        self.vars = [tuple(x1.keys()), tuple(x2.keys())]
-        data = [x1.values(), x2.values()]
-        self.dataset = PeriodicDataset(data, device)
+        self.sampler = sampler
+        self.sampler1 = sampler1
+        self.sampler2 = sampler2
+
+        inputs1 = tuple(self.sampler1.sample(1).keys())
+        inputs2 = tuple(self.sampler2.sample(1).keys())
+        vars1, vars2 = sampler.vars + inputs1, sampler.vars + inputs2
+        assert len(vars1) == len(
+            vars2), 'Samplers must have the same variables'
+        for var in vars1:
+            assert var in vars2, 'Samplers must have the same variables'
+        self.vars = vars1
+
+    def sample(self, n_samples=None):
+        shared = self.sampler.sample(n_samples)
+        inputs = self.sampler1.sample(n_samples)
+        inputs.update(shared)
+        outputs = self.sampler2.sample(n_samples)
+        outputs.update(shared)
+        return inputs, outputs
 
     def validate(self, inputs, outputs):
         super().validate()
-        _inputs1, _inputs2 = self.vars
-        assert inputs == _inputs1, f'Boco {self.name} with different inputs !'
-        assert inputs == _inputs2, f'Boco {self.name} with different inputs !'
+        assert len(inputs) == len(
+            self.vars), f'Boco {self.name} with different inputs !'
+        for var in self.vars:
+            assert var in inputs, f'Boco {self.name} with different inputs !'
 
-    def computeLoss(self, batch, model, criterion):
-        x1, x2 = batch
-        p1 = model(x1)
-        p2 = model(x2)
-        return {self.name: criterion(p1, p2)}
+    def computeLoss(self, model, criterion, inputs, outputs):
+        _x1, _x2 = self.sample()
+        x1 = torch.stack([
+            _x1[var]
+            for var in inputs
+        ], axis=-1)
+        x2 = torch.stack([
+            _x2[var]
+            for var in inputs
+        ], axis=-1)
+        y1 = model(x1)
+        y2 = model(x2)
+        return {self.name: criterion(y1, y2)}

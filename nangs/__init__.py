@@ -1,6 +1,6 @@
-__version__ = "0.1.2"
+__version__ = "2021.12.05"
 
-from .data import *
+from .samplers import *
 from .nn import *
 from .bocos import *
 from .pde import PDE
