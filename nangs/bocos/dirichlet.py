@@ -33,9 +33,13 @@ class Dirichlet(Boco):
             _X[var]
             for var in inputs
         ], axis=-1)
-        y = torch.stack([
-            _y[var]
-            for var in outputs
-        ], axis=-1)
         y_hat = model(X)
+        __y = []
+        for i, var in enumerate(outputs):
+            if var in _y:
+                __y.append(_y[var])
+            else:
+                __y.append(y_hat[:, i])
+        y = torch.stack(__y, axis=-1)
+
         return {self.name: criterion(y, y_hat)}
