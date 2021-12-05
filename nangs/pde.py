@@ -57,10 +57,10 @@ class PDE():
     def computePDELoss(self, vars, grads):
         print("This function need to be overloaded !!!")
 
-    def solve(self, N_STEPS=50):
+    def solve(self, N_STEPS=1000, log_each=100):
         # solve PDE
         history = History()
-        pbar = tqdm(range(1, N_STEPS + 1))
+        pbar = tqdm(range(1, N_STEPS + 1), miniters=int(N_STEPS/log_each))
         for step in pbar:
             history.add({'lr': get_lr(self.optimizer)})
             self.optimizer.zero_grad()
@@ -90,7 +90,8 @@ class PDE():
                     history.add_step({name: l.item()})
             loss.backward()
             self.optimizer.step()
-            pbar.set_description(str(history.average()))
+            if step % log_each == 0:
+                pbar.set_description(str(history.average()))
             history.step()
             if self.scheduler:
                 self.scheduler.step()
