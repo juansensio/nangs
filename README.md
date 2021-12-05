@@ -23,4 +23,4 @@ You will also need to install [Pytorch](https://pytorch.org/).
 
 ## Copyright
 
-Copyright 2020 onwards, SensioAI. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project's files except in compliance with the License. A copy of the License is provided in the LICENSE file in this repository.
+Copyright 2020 onwards, SensioIA. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this project's files except in compliance with the License. A copy of the License is provided in the LICENSE file in this repository.

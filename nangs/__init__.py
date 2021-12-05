@@ -1,4 +1,4 @@
-__version__ = "2021.12.05"
+__version__ = "2021.12.06"
 
 from .samplers import *
 from .nn import *
